@@ -9,6 +9,9 @@ using Business.BusinessAspect.Autofac;
 using Business.Constants;
 using Business.CrossCuttinSource;
 using Business.ValidationRules;
+using Core.Aspects.Autofac.Caching;
+using Core.Aspects.Autofac.Performance;
+using Core.Aspects.Autofac.Transaction;
 using Core.Aspects.Autofac.Validation;
 using Core.Business;
 using Core.CrossCuttingCorncerns.Validation;
@@ -42,6 +45,7 @@ namespace Business.Concrete
 
         [SecuredOperation("car.add, admin")]
         [ValidationAspect(typeof(CarValidator))]
+        [CacheRemoveAspect("ICarService.Get")]
         public IResult Add(Car car)
         {
             IResult result = BusinessRules.Run(CheckIfCarCountOfBarandCorrect(car.BrandId), 
@@ -66,6 +70,7 @@ namespace Business.Concrete
 
         [SecuredOperation("car.update, admin")]
         [ValidationAspect(typeof(CarValidator))]
+        [CacheRemoveAspect("ICarService.Get")]
         public IResult Update(Car car)
         {
             if (ValidateCarData(car))
@@ -77,6 +82,8 @@ namespace Business.Concrete
             return new SuccessResult(Messages.CarDataInvalid);
         }
 
+        [CacheAspect()]
+        [PerformanceAspect(5)]
         public IDataResult<Car> GetById(int Id)
         {
             return new SuccessDataResult<Car>(_carDal.Get(c => c.Id == Id), Messages.CarsListed);
@@ -86,7 +93,7 @@ namespace Business.Concrete
         {
             return new SuccessDataResult<List<Car>>(_carDal.GetAll(c => c.BrandId == brandId), Messages.CarsListed);
         }
-
+        [CacheAspect()]
         public IDataResult<List<Car>> GetAll()
         {
             if (DateTime.Now.Hour == 03)
@@ -156,6 +163,19 @@ namespace Business.Concrete
                 return new ErrorResult(Messages.BrandLimitExists);
             }
             return new SuccessResult();
+        }
+
+        [TransactionScopeAspect]
+        public IResult AddTransactionalTest(Car car)
+        {
+
+            Add(car);
+            if (car.DailyPrice<100)
+            {
+                throw new Exception("");
+            }
+            Add(car);
+            return null;
         }
     }
 }
