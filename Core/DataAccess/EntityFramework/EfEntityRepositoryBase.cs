@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Core.Entities;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Core.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Text;
 
 namespace Core.DataAccess.EntityFramework
 {
@@ -16,7 +16,7 @@ namespace Core.DataAccess.EntityFramework
         {
             using (TContext context = new TContext())
             {
-                EntityEntry<TEntity> addedEntity = context.Entry(entity);
+                var addedEntity = context.Entry(entity);
                 addedEntity.State = EntityState.Added;
                 context.SaveChanges();
             }
@@ -26,11 +26,10 @@ namespace Core.DataAccess.EntityFramework
         {
             using (TContext context = new TContext())
             {
-                EntityEntry<TEntity> deletedEntity = context.Entry(entity);
+                var deletedEntity = context.Entry(entity);
                 deletedEntity.State = EntityState.Deleted;
                 context.SaveChanges();
             }
-
         }
 
         public TEntity Get(Expression<Func<TEntity, bool>> filter)
@@ -55,7 +54,7 @@ namespace Core.DataAccess.EntityFramework
         {
             using (TContext context = new TContext())
             {
-                EntityEntry<TEntity> updatedEntity = context.Entry(entity);
+                var updatedEntity = context.Entry(entity);
                 updatedEntity.State = EntityState.Modified;
                 context.SaveChanges();
             }

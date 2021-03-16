@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Business.Abstract;
+using Entities.DTOs;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Business.Abstract;
-using Entities.DTOs;
 
 namespace WebAPI.Controllers
 {
@@ -13,7 +13,7 @@ namespace WebAPI.Controllers
     [ApiController]
     public class AuthController : Controller
     {
-        private IAuthService _authService;
+        IAuthService _authService;
 
         public AuthController(IAuthService authService)
         {
@@ -28,13 +28,11 @@ namespace WebAPI.Controllers
             {
                 return BadRequest(userToLogin.Message);
             }
-
             var result = _authService.CreateAccessToken(userToLogin.Data);
             if (result.Success)
             {
                 return Ok(result.Data);
             }
-
             return BadRequest(result.Message);
         }
 

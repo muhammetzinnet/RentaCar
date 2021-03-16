@@ -50,7 +50,7 @@ namespace Business.Concrete
             return new SuccessDataResult<List<Rental>>(_rentalDal.GetAll());
         }
 
-        public IDataResult<Rental> GetByRentalId(int rentalId)
+        public IDataResult<Rental> GetById(int rentalId)
         {
             return new SuccessDataResult<Rental>(_rentalDal.Get(b => b.Id == rentalId));
         }
